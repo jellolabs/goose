@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/ox/goose/lib/goose"
 	"log"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/jellolabs/goose/lib/goose"
 )
 
 var createCmd = &Command{

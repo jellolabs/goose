@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/ox/goose/lib/goose"
 	"log"
+
+	"github.com/jellolabs/goose/lib/goose"
 )
 
 var upCmd = &Command{

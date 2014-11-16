@@ -8,7 +8,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/ox/goose/lib/goose"
+	"github.com/jellolabs/goose/lib/goose"
 )
 
 // global options. available to any subcommands.
