@@ -4,9 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	_ "github.com/lib/pq"
-	_ "github.com/mattn/go-sqlite3"
-	_ "github.com/ziutek/mymysql/godrv"
 	"log"
 	"os"
 	"path/filepath"
@@ -15,6 +12,10 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	_ "github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/ziutek/mymysql/godrv"
 )
 
 var (
@@ -340,14 +341,18 @@ func GetMostRecentDBVersion(dirpath string) (version int64, err error) {
 	return
 }
 
-func CreateMigration(name, migrationType, dir string, t time.Time) (path string, err error) {
+func CreateMigration(name, migrationType, dir string) (path string, err error) {
 
 	if migrationType != "go" && migrationType != "sql" {
 		return "", errors.New("migration type must be 'go' or 'sql'")
 	}
 
-	timestamp := t.Format("20060102150405")
-	filename := fmt.Sprintf("%v_%v.%v", timestamp, name, migrationType)
+	version, err := GetMostRecentDBVersion(dir)
+	if err != nil {
+		version = 0
+	}
+
+	filename := fmt.Sprintf("%03d_%v.%v", version+1, name, migrationType)
 
 	fpath := filepath.Join(dir, filename)
 
@@ -358,7 +363,7 @@ func CreateMigration(name, migrationType, dir string, t time.Time) (path string,
 		tmpl = goMigrationTemplate
 	}
 
-	path, err = writeTemplateToFile(fpath, tmpl, timestamp)
+	path, err = writeTemplateToFile(fpath, tmpl, version)
 
 	return
 }

@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/jellolabs/goose/lib/goose"
 )
@@ -38,7 +37,7 @@ func createRun(cmd *Command, args ...string) {
 		log.Fatal(err)
 	}
 
-	n, err := goose.CreateMigration(args[0], migrationType, conf.MigrationsDir, time.Now())
+	n, err := goose.CreateMigration(args[0], migrationType, conf.MigrationsDir)
 	if err != nil {
 		log.Fatal(err)
 	}
