@@ -24,7 +24,7 @@ func createRun(cmd *Command, args ...string) {
 		log.Fatal("goose create: migration name required")
 	}
 
-	migrationType := "go" // default to Go migrations
+	migrationType := "sql" // default to SQL migrations
 	if len(args) >= 2 {
 		migrationType = args[1]
 	}
