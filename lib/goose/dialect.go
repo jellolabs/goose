@@ -2,6 +2,7 @@ package goose
 
 import (
 	"database/sql"
+
 	"github.com/mattn/go-sqlite3"
 )
 
@@ -22,6 +23,8 @@ func dialectByName(d string) SqlDialect {
 		return &MySqlDialect{}
 	case "sqlite3":
 		return &Sqlite3Dialect{}
+	case "redshift":
+		return &RedshiftDialect{}
 	}
 
 	return nil
@@ -119,5 +122,35 @@ func (m Sqlite3Dialect) dbVersionQuery(db *sql.DB) (*sql.Rows, error) {
 	case sqlite3.Error:
 		return nil, ErrTableDoesNotExist
 	}
+	return rows, err
+}
+
+////////////////////////////
+// Redshift
+////////////////////////////
+
+type RedshiftDialect struct{}
+
+func (r *RedshiftDialect) createVersionTableSql() string {
+	return `CREATE TABLE goose_db_version (
+                id INT4 IDENTITY(1,1) NOT NULL PRIMARY KEY,
+                version_id INT8 NOT NULL,
+                is_applied BOOL NOT NULL,
+                tstamp TIMESTAMP NOT NULL DEFAULT SYSDATE
+            )
+            sortkey(id);`
+}
+
+func (r *RedshiftDialect) insertVersionSql() string {
+	return "INSERT INTO goose_db_version (version_id, is_applied) VALUES ($1, $2);"
+}
+
+func (r *RedshiftDialect) dbVersionQuery(db *sql.DB) (*sql.Rows, error) {
+	rows, err := db.Query("SELECT version_id, is_applied from goose_db_version ORDER BY id DESC")
+
+	if err != nil {
+		return nil, ErrTableDoesNotExist
+	}
+
 	return rows, err
 }
